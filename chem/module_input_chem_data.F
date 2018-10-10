@@ -338,7 +338,8 @@ SUBROUTINE setup_gasprofile_maps(chem_opt, numgas)
      call setup_gasprofile_map_radm_racm
 
   case (SAPRC99_KPP,SAPRC99_MOSAIC_4BIN_VBS2_KPP,      &
-     SAPRC99_MOSAIC_8BIN_VBS2_AQ_KPP, SAPRC99_MOSAIC_8BIN_VBS2_KPP)!BSINGH(12/04/2013): Added SAPRC 8 bin and non-aq on 04/03/2014)
+     SAPRC99_MOSAIC_8BIN_VBS2_AQ_KPP, SAPRC99_MOSAIC_8BIN_VBS2_KPP, &!BSINGH(12/04/2013): Added SAPRC 8 bin and non-aq on 04/03/2014)
+     SAPRC99_MOSAIC_8BIN_VBS2_AQ_HALOGENS_KPP)
      call setup_gasprofile_map_saprcnov
 
 
@@ -2410,7 +2411,8 @@ END SUBROUTINE bdy_chem_value_ghg
         get_last_gas = p_ho2
 
      case (SAPRC99_KPP,SAPRC99_MOSAIC_4BIN_VBS2_KPP, &
-          SAPRC99_MOSAIC_8BIN_VBS2_AQ_KPP,SAPRC99_MOSAIC_8BIN_VBS2_KPP )!BSINGH(12/13/2013): Added SAPRC 8 bin AQ case and non-aq on 04/03/2014
+          SAPRC99_MOSAIC_8BIN_VBS2_AQ_KPP,SAPRC99_MOSAIC_8BIN_VBS2_KPP, &!BSINGH(12/13/2013): Added SAPRC 8 bin AQ case and non-aq on 04/03/2014
+          SAPRC99_MOSAIC_8BIN_VBS2_AQ_HALOGENS_KPP)
         get_last_gas = p_ch4
 
 
