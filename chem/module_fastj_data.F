@@ -24,12 +24,12 @@
         USE module_data_mosaic_other, only : kmaxd
 !jdf
        integer, parameter :: double = 8        !compiler dependent value real*8
-       integer,parameter :: jppj=14        !Number of photolytic reactions supplied
+       integer,parameter :: jppj=15        !Number of photolytic reactions supplied
 !jdf
 
         INTEGER  NB, NC !values set in fastj_driver, don't confuse
                         !this nc with the one in module_fastj_mie
-        INTEGER, PARAMETER :: NS=15, NW=15, NP=21, NH=7, MX=3
+        INTEGER, PARAMETER :: NS=16, NW=15, NP=21, NH=7, MX=3
 
 !titls variables
         CHARACTER*55 TITLE0(3)
@@ -117,7 +117,7 @@
            0.1000D+01,  0.1000D+01,  0.1000D+01,   &
            0.1000D+01,  0.1000D+01,  0.1000D+01,   &
            0.1000D+01,  0.1000D+01,  0.1000D+01,   &
-           0.1000D+01,  0.1000D+01   &
+           0.1000D+01,  0.1000D+01,  0.1000D+01    &
          /
        data jlabel   &
          /   &
@@ -125,7 +125,7 @@
           'H2O2   ', 'HCHO_a ', 'HCHO_b ',   &
           'MeOOH  ', 'NO3_X  ', 'NO3_L  ',   &
           'HONO   ', 'N2O5   ', 'HONO2  ',   &
-          'HO2NO2 ', 'C2H5O2 '   &
+          'HO2NO2 ', 'C2H5O2 ', 'BR2    '    &
          /         
 
 ! from rd_tjpl2
@@ -135,7 +135,7 @@
          /
        data NJVAL,NWWW,NW1,NW2   &
          /   &
-          15,    7,    1,    7   &
+          16,    7,    1,    7   &
          /
        data (WBIN(IW),IW=1,  8)   &
          /   &
@@ -240,29 +240,33 @@
           0.2370E+00,   0.8570E-01,   0.0000E+00,   &
           0.0000E+00   &
          /
-        data (TITLEJ(1,JTMP), JTMP=4,15)   &
+        data (TITLEJ(1,JTMP), JTMP=4,16)   &
          /   &
         'H2O2   ',  'HCHO_a ',  'HCHO_b ',  'MeOOH  ',   &
         'NO2    ',  'NO3_X  ',  'NO3_L  ',  'N2O5   ',   &
-        'HONO   ',  'HONO2  ',  'HO2NO2 ',  'C2H5O2 '   &
+        'HONO   ',  'HONO2  ',  'HO2NO2 ',  'C2H5O2 ',   &
+        'BR2    ' &
          /
-       data (TITLEJ(2,JTMP), JTMP=4,15)   &
+       data (TITLEJ(2,JTMP), JTMP=4,16)   &
          /   &
         'H2O2   ',  'HCHO_a ',  'HCHO_b ',  'MeOOH  ',   &
         'NO2    ',  'NO3_X  ',  'NO3_L  ',  'N2O5   ',   &
-        'HONO   ',  'HONO2  ',  'HO2NO2 ',  'C2H5O2 '   &
+        'HONO   ',  'HONO2  ',  'HO2NO2 ',  'C2H5O2 ',   &
+        'BR2    ' &
          /
-        data (TQQ(1,JTMP), JTMP= 4,15)   &
+        data (TQQ(1,JTMP), JTMP= 4,16)   &
          /   &
          200.,   223.,   223.,   200.,   &
          200.,   200.,   200.,   225.,   &
-         200.,   200.,   200.,   200.   &
+         200.,   200.,   200.,   200.,   &
+         200.   &
          /
-        data (TQQ(2,JTMP), JTMP= 4,15)   &
+        data (TQQ(2,JTMP), JTMP= 4,16)   &
          /   &
          300.,   293.,   293.,   300.,   &
          300.,   300.,   300.,   300.,   &
-         300.,   300.,   300.,   300.   &
+         300.,   300.,   300.,   300.,   &
+         300.   &
          /
         data (QQQ(IW,1, 1), IW=1, 7)   &
          /   &
@@ -324,6 +328,11 @@
          0.47500E-18,   0.12130E-19,   0.00000E+00,   0.00000E+00,   &
          0.00000E+00,   0.00000E+00,   0.00000E+00   &
          /
+        data (QQQ(IW,1,13), IW=1, 7)   &
+         /   &
+         2.023E-22,     1.147E-22,     1.498E-22,     3.956E-22,     & 
+         6.863E-21,     3.599E-19 ,    8.293E-20     &
+         /
         data (QQQ(IW,2, 1), IW=1, 7)   &
          /   &
          0.98180E-20,   0.57350E-20,   0.37970E-20,   0.25850E-20,   &
@@ -383,6 +392,11 @@
          /   &
          0.47500E-18,   0.12130E-19,   0.00000E+00,   0.00000E+00,   &
          0.00000E+00,   0.00000E+00,   0.00000E+00   &
+         /
+        data (QQQ(IW,2,13), IW=1, 7)   &
+         /   &
+         2.023E-22,     1.147E-22,     1.498E-22,     3.956E-22,     & 
+         6.863E-21,     3.599E-19 ,    8.293E-20     &
          /
        data TITLE0(2)   &
          /   &

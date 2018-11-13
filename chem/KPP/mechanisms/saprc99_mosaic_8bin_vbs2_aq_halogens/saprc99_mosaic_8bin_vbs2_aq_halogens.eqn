@@ -406,7 +406,7 @@
 {369} ClONO2 = ClO + NO2 : jrates('Pj_ClONO2_NO2');
 {370} ClO = Cl + O3P : jrates('Pj_ClO_O3P');
 {371} BrO = Br + O3 : jrates('Pj_BrO');
-{372} Br2 = 2.00*Br : jrates('Pj_Br2');
+{372} Br2 = 2.00*Br : j(Pj_Br2);
 {373} HOBr = Br + OH : jrates('Pj_HOBr');
 {374} BrNO2 = Br + NO2 : jrates('Pj_BrNO2');
 {375} BrONO2 = Br + NO3 : jrates('Pj_BrONO2_Br');
