@@ -80,6 +80,7 @@
                ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,        &
                ph_brono2_bro, ph_clo_o3p, ph_clo_o1d, ph_cl2, ph_hocl, &
                ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl,        &
+               ph_oclo,                                                &
                !LMarelle--
                snowh, snowc, xice,                                     &
                tauaer1,tauaer2,tauaer3,tauaer4,                        &
@@ -108,7 +109,7 @@
    integer, parameter :: single = 4        !compiler dependent value real*4
    integer, parameter :: double = 8        !compiler dependent value real*8
    integer,parameter :: ipar_fastj=1,jpar=1
-   integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+   integer,parameter :: jppj=29        !Number of photolytic reactions supplied
    logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
    integer,save :: lpar           !Number of levels in CTM
    integer,save :: jpnl           !Number of levels requiring chemistry
@@ -128,7 +129,7 @@
    data wavmid     &
        / 0.30e-4, 0.40e-4, 0.60e-4 ,0.999e-04 /
    integer nphoto_fastj
-   parameter (nphoto_fastj = 29)
+   parameter (nphoto_fastj = 30)
    integer   &
    lfastj_no2,   lfastj_o3a,   lfastj_o3b,    lfastj_h2o2,   &
    lfastj_hchoa, lfastj_hchob, lfastj_ch3ooh, lfastj_no3x,   &
@@ -137,7 +138,9 @@
    lfastj_bro, lfastj_br2, lfastj_hobr, lfastj_brno2,        &
    lfastj_brono2_br, lfastj_brono2_bro, lfastj_clo_o3p,      &
    lfastj_clo_o1d, lfastj_cl2, lfastj_hocl, lfastj_clno2,    &
-   lfastj_clono2_no2, lfastj_clono2_no3, lfastj_brcl
+   lfastj_clono2_no2, lfastj_clono2_no3, lfastj_brcl,        &
+   lfastj_oclo
+
    parameter( lfastj_no2   = 1 )
    parameter( lfastj_o3a   = 2 )
    parameter( lfastj_o3b   = 3 )
@@ -165,6 +168,7 @@
    parameter( lfastj_clono2_no2 = 26)
    parameter( lfastj_clono2_no3 = 27)
    parameter( lfastj_brcl = 28)
+   parameter( lfastj_oclo = 29)
 !jdf
    INTEGER,      INTENT(IN   ) :: id,julday,                    &
                                   ids,ide, jds,jde, kds,kde,    &
@@ -183,7 +187,7 @@
            !LMarelle Additional photolysis rates for halogen mechanisms
            ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,            &
            ph_brono2_bro, ph_clo_o3p, ph_clo_o1d, ph_cl2, ph_hocl,     &
-           ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl
+           ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl, ph_oclo
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                    &
          INTENT(IN ) ::                                             &
            tauaer1,tauaer2,tauaer3,tauaer4,                         &
@@ -405,7 +409,7 @@
            ph_n2o5,                                                 &
            ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,         &
            ph_brono2_bro, ph_clo_o3p, ph_clo_o1d, ph_cl2, ph_hocl,  &
-           ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl)
+           ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl, ph_oclo)
 ! put the aerosol optical properties into the wrf arrays (this is hard-
 ! coded to 4 spectral bins, nspint)
 !     do k=kts,kte
@@ -447,14 +451,14 @@
         ph_n2o5,                                                    &
         ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,            &
         ph_brono2_bro, ph_clo_o3p, ph_clo_o1d, ph_cl2, ph_hocl,     &
-        ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl)
+        ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl, ph_oclo)
 
 	USE module_data_cbmz
 
    implicit none
 !jdf
    integer nphoto_fastj
-   parameter (nphoto_fastj = 29)
+   parameter (nphoto_fastj = 30)
    integer   &
    lfastj_no2,   lfastj_o3a,   lfastj_o3b,    lfastj_h2o2,   &
    lfastj_hchoa, lfastj_hchob, lfastj_ch3ooh, lfastj_no3x,   &
@@ -463,7 +467,8 @@
    lfastj_brno2,                                             &
    lfastj_brono2_br, lfastj_brono2_bro, lfastj_clo_o3p,      &
    lfastj_clo_o1d, lfastj_cl2, lfastj_hocl, lfastj_clno2,    &
-   lfastj_clono2_no2, lfastj_clono2_no3, lfastj_brcl
+   lfastj_clono2_no2, lfastj_clono2_no3, lfastj_brcl,        &
+   lfastj_oclo
    parameter( lfastj_no2   = 1 )
    parameter( lfastj_o3a   = 2 )
    parameter( lfastj_o3b   = 3 )
@@ -491,6 +496,7 @@
    parameter( lfastj_clono2_no2 = 26)
    parameter( lfastj_clono2_no3 = 27)
    parameter( lfastj_brcl = 28)
+   parameter( lfastj_oclo = 29)
 !jdf
    INTEGER,      INTENT(IN   ) :: iflag,                        &
                                   ims,ime, jms,jme, kms,kme,    &
@@ -505,7 +511,7 @@
            ph_n2o5,                                                & 
            ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,        &
            ph_brono2_bro, ph_clo_o3p, ph_clo_o1d, ph_cl2, ph_hocl, &
-           ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl
+           ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl, ph_oclo
 
    REAL, DIMENSION( kte,nphoto_fastj ), INTENT(INOUT) :: valuej
 
@@ -545,6 +551,7 @@
           ph_clono2_no2(iclm,kt,jclm) = valuej(kt,lfastj_clono2_no2) * ft
           ph_clono2_no3(iclm,kt,jclm) = valuej(kt,lfastj_clono2_no3) * ft
           ph_brcl(iclm,kt,jclm)       = valuej(kt,lfastj_brcl) * ft
+          ph_oclo(iclm,kt,jclm)       = valuej(kt,lfastj_oclo) * ft
 
 	  ph_o2(iclm,kt,jclm)        = 0.0
 	  ph_ch3cho(iclm,kt,jclm)    = 0.0
@@ -590,6 +597,7 @@
           valuej(kt,lfastj_clono2_no2) = ph_clono2_no2(iclm,kt,jclm) / ft 
           valuej(kt,lfastj_clono2_no3) = ph_clono2_no3(iclm,kt,jclm) / ft
           valuej(kt,lfastj_brcl)       = ph_brcl(iclm,kt,jclm) / ft
+          valuej(kt,lfastj_oclo)       = ph_oclo(iclm,kt,jclm) / ft
 
 	end do
 
@@ -665,7 +673,7 @@
    integer, parameter :: single = 4        !compiler dependent value real*4
    integer, parameter :: double = 8        !compiler dependent value real*8
    integer,parameter :: ipar_fastj=1,jpar=1
-   integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+   integer,parameter :: jppj=29        !Number of photolytic reactions supplied
    logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
    integer lpar           !Number of levels in CTM
    integer jpnl           !Number of levels requiring chemistry
@@ -678,7 +686,7 @@
    integer month_fastj        !  Number of month (1-12)
    integer iday_fastj         !  Day of year
    integer nphoto_fastj
-   parameter (nphoto_fastj = 29)
+   parameter (nphoto_fastj = 30)
    integer   &
    lfastj_no2,   lfastj_o3a,   lfastj_o3b,    lfastj_h2o2,   &
    lfastj_hchoa, lfastj_hchob, lfastj_ch3ooh, lfastj_no3x,   &
@@ -687,7 +695,8 @@
    lfastj_brno2,                                             &
    lfastj_brono2_br, lfastj_brono2_bro, lfastj_clo_o3p,      &
    lfastj_clo_o1d, lfastj_cl2, lfastj_hocl, lfastj_clno2,    &
-   lfastj_clono2_no2, lfastj_clono2_no3, lfastj_brcl
+   lfastj_clono2_no2, lfastj_clono2_no3, lfastj_brcl,        &
+   lfastj_oclo
    parameter( lfastj_no2   = 1 )
    parameter( lfastj_o3a   = 2 )
    parameter( lfastj_o3b   = 3 )
@@ -715,6 +724,7 @@
    parameter( lfastj_clono2_no2 = 26)
    parameter( lfastj_clono2_no3 = 27)
    parameter( lfastj_brcl = 28)
+   parameter( lfastj_oclo = 29)
    integer nspint           ! Num of spectral intervals across solar 
    parameter ( nspint = 4 ) ! spectrum for FAST-J
    real, dimension (nspint),save :: wavmid !cm
@@ -910,6 +920,7 @@
              valuej(k, lfastj_clono2_no2) = jvalue(k,lfastj_clono2_no2) 
              valuej(k, lfastj_clono2_no3) = jvalue(k,lfastj_clono2_no3)
              valuej(k, lfastj_brcl)       = jvalue(k,lfastj_brcl)
+             valuej(k, lfastj_oclo)       = jvalue(k,lfastj_oclo)
 	  end do
 ! diagnostic output and zeroed value if negative photolysis rates returned
 	  do k = 1, lpar
@@ -1048,7 +1059,7 @@
 ! following specific for fastj
 ! jppj will be gas phase mechanism dependent       
        integer,parameter :: ipar_fastj=1,jpar=1
-!      integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!      integer,parameter :: jppj=29        !Number of photolytic reactions supplied
        logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
 ! The vertical level variables are set in fastj_driver.
        integer lpar           !Number of levels in CTM
@@ -1186,7 +1197,7 @@
         integer, parameter :: single = 4        !compiler dependent value real*4
 !       integer, parameter :: double = 8        !compiler dependent value real*8
        integer,parameter :: ipar_fastj=1,jpar=1
-!      integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!      integer,parameter :: jppj=29        !Number of photolytic reactions supplied
        logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
        integer lpar           !Number of levels in CTM
        integer jpnl           !Number of levels requiring chemistry
@@ -1247,7 +1258,7 @@
        integer, parameter :: single = 4        !compiler dependent value real*4
 !      integer, parameter :: double = 8        !compiler dependent value real*8
        integer,parameter :: ipar_fastj=1,jpar=1
-!      integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!      integer,parameter :: jppj=29        !Number of photolytic reactions supplied
        logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
        integer lpar           !Number of levels in CTM
        integer jpnl           !Number of levels requiring chemistry
@@ -1383,7 +1394,7 @@
       integer, parameter :: single = 4        !compiler dependent value real*4
 !     integer, parameter :: double = 8        !compiler dependent value real*8
       integer,parameter :: ipar_fastj=1,jpar=1
-!     integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!     integer,parameter :: jppj=29        !Number of photolytic reactions supplied
       logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
       integer lpar           !Number of levels in CTM
       integer jpnl           !Number of levels requiring chemistry
@@ -1554,7 +1565,7 @@
       integer, parameter :: single = 4        !compiler dependent value real*4
 !     integer, parameter :: double = 8        !compiler dependent value real*8
       integer,parameter :: ipar_fastj=1,jpar=1
-!     integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!     integer,parameter :: jppj=29        !Number of photolytic reactions supplied
       logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
       integer lpar           !Number of levels in CTM
       integer jpnl           !Number of levels requiring chemistry
@@ -1653,7 +1664,7 @@
       integer, parameter :: single = 4        !compiler dependent value real*4
 !     integer, parameter :: double = 8        !compiler dependent value real*8
       integer,parameter :: ipar_fastj=1,jpar=1
-!     integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!     integer,parameter :: jppj=29        !Number of photolytic reactions supplied
       logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
       integer lpar           !Number of levels in CTM
       integer jpnl           !Number of levels requiring chemistry
@@ -1716,7 +1727,7 @@
       integer, parameter :: single = 4        !compiler dependent value real*4
 !     integer, parameter :: double = 8        !compiler dependent value real*8
       integer,parameter :: ipar_fastj=1,jpar=1
-!     integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!     integer,parameter :: jppj=29        !Number of photolytic reactions supplied
       logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
       integer lpar           !Number of levels in CTM
       integer jpnl           !Number of levels requiring chemistry
@@ -1819,7 +1830,7 @@
       integer, parameter :: single = 4        !compiler dependent value real*4
 !     integer, parameter :: double = 8        !compiler dependent value real*8
       integer,parameter :: ipar_fastj=1,jpar=1
-!     integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!     integer,parameter :: jppj=29        !Number of photolytic reactions supplied
       logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
       integer lpar           !Number of levels in CTM
       integer jpnl           !Number of levels requiring chemistry
@@ -1926,7 +1937,7 @@
         integer, parameter :: single = 4        !compiler dependent value real*4
 !       integer, parameter :: double = 8        !compiler dependent value real*8
        integer,parameter :: ipar_fastj=1,jpar=1
-!      integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!      integer,parameter :: jppj=29        !Number of photolytic reactions supplied
        logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
        integer lpar           !Number of levels in CTM
        integer jpnl           !Number of levels requiring chemistry
@@ -2271,7 +2282,7 @@
       integer, parameter :: single = 4        !compiler dependent value real*4
 !     integer, parameter :: double = 8        !compiler dependent value real*8
       integer,parameter :: ipar_fastj=1,jpar=1
-!     integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!     integer,parameter :: jppj=29        !Number of photolytic reactions supplied
       logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
       integer lpar           !Number of levels in CTM
       integer jpnl           !Number of levels requiring chemistry
@@ -3532,7 +3543,7 @@
         integer, parameter :: single = 4        !compiler dependent value real*4
 !       integer, parameter :: double = 8        !compiler dependent value real*8
         integer,parameter :: ipar_fastj=1,jpar=1
-!       integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+!       integer,parameter :: jppj=29        !Number of photolytic reactions supplied
         logical,parameter :: ldeg45=.false. !Logical flag for degraded CTM resolution
         integer lpar           !Number of levels in CTM
         integer jpnl           !Number of levels requiring chemistry

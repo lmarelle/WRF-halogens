@@ -24,6 +24,7 @@
                ph_brono2_br, ph_brono2_bro, ph_clo_o3p,                  &
                ph_clo_o1d,                    &
                ph_clono2_no2, ph_clono2_no3, ph_brcl,                    &
+               ph_oclo,                                                  &
                !LMarelle--
                nref0, nw0, tuv_jmax0,                                    &
                ph_radfld, ph_adjcoe, ph_prate,                           &
@@ -85,8 +86,8 @@
            ph_cl2,ph_hocl,ph_fmcl,                                     &
            !LMarelle Additional photolysis rates for halogen mechanisms
            ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,            &
-           ph_brono2_bro, ph_clo_o3p, ph_clo_o1d,      &
-           ph_clono2_no2, ph_clono2_no3, ph_brcl
+           ph_brono2_bro, ph_clo_o3p, ph_clo_o1d,                      &
+           ph_clono2_no2, ph_clono2_no3, ph_brcl, ph_oclo
 
    REAL, INTENT(INOUT)  ::                                             &
            dt_cld(ims:ime,kms:kme,jms:jme),                            &
@@ -199,6 +200,7 @@
                ph_bro, ph_br2, ph_hobr, ph_brno2, ph_brono2_br,        &
                ph_brono2_bro, ph_clo_o3p, ph_clo_o1d, ph_cl2, ph_hocl, &
                ph_clno2, ph_clono2_no2, ph_clono2_no3, ph_brcl,        &
+               ph_oclo,                                                 &
                !LMarelle--
                snowh, snowc, xice,                                     &
                tauaer1,tauaer2,tauaer3,tauaer4,                        &

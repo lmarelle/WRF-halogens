@@ -398,7 +398,7 @@
 {245} DMS+OH=SO2                     : ARR2(9.6e-12_dp, 234._dp, TEMP) ;
 {246} DMS+OH=.5 SO2+.5 HO2           : usr24( temp, c_m ) ;
 {247} DMS+NO3=SO2+HNO3               : ARR2(1.9e-13_dp, -520._dp, TEMP) ;
-{364} OClO = O3 + ClO : jrates('Pj_OClO');
+{364} OClO = O3 + ClO : j(Pj_OClO);
 {365} Cl2 + hv = Cl + Cl : j(Pj_Cl2);
 {366} HOCl + hv = Cl + OH : j(Pj_HOCl);
 {367} ClNO2 + hv = Cl + NO2 : j(Pj_ClNO2);

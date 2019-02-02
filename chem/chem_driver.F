@@ -989,6 +989,7 @@
               grid%ph_brono2_br, grid%ph_brono2_bro, grid%ph_clo_o3p,                 &
               grid%ph_clo_o1d, &
               grid%ph_clono2_no2, grid%ph_clono2_no3, grid%ph_brcl,                   &
+              grid%ph_oclo,                                                           &
               !LMarelle--
               config_flags%track_tuv_lev,                                             &
               config_flags%track_rad_num,                                             &

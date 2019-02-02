@@ -24,12 +24,12 @@
         USE module_data_mosaic_other, only : kmaxd
 !jdf
        integer, parameter :: double = 8        !compiler dependent value real*8
-       integer,parameter :: jppj=28        !Number of photolytic reactions supplied
+       integer,parameter :: jppj=29        !Number of photolytic reactions supplied
 !jdf
 
         INTEGER  NB, NC !values set in fastj_driver, don't confuse
                         !this nc with the one in module_fastj_mie
-        INTEGER, PARAMETER :: NS=29, NW=15, NP=21, NH=7, MX=3
+        INTEGER, PARAMETER :: NS=30, NW=15, NP=21, NH=7, MX=3
 
 !titls variables
         CHARACTER*55 TITLE0(3)
@@ -145,7 +145,7 @@
          /
        data NJVAL,NWWW,NW1,NW2   &
          /   &
-          29,    7,    1,    7   &
+          30,    7,    1,    7   &
          /
        data (WBIN(IW),IW=1,  8)   &
          /   &
@@ -305,7 +305,7 @@
           0.65719    ,  0.77862    ,  1.0        ,  &
           1.0          &
          /
-        data (TITLEJ(1,JTMP), JTMP=4,29)   &
+        data (TITLEJ(1,JTMP), JTMP=4,30)   &
          /   &
         'H2O2   ',  'HCHO_a ',  'HCHO_b ',  'MeOOH  ',   &
         'NO2    ',  'NO3_X  ',  'NO3_L  ',  'N2O5   ',   &
@@ -313,9 +313,9 @@
         'BRO    ',  'BR2    ',  'HOBR   ',  'BRNO2  ',   &
         '1BRONO2',  '2BRONO2',  '1CLO   ',  '2CLO   ',   &
         'CL2    ',  'HOCL   ',  'CLNO2  ',  '1CLONO2',   &
-        '2CLONO2',  'BRCL   '                          &
+        '2CLONO2',  'BRCL   ',  'OCLO   '              &
          /
-       data (TITLEJ(2,JTMP), JTMP=4,29)   &
+       data (TITLEJ(2,JTMP), JTMP=4,30)   &
          /   &
         'H2O2   ',  'HCHO_a ',  'HCHO_b ',  'MeOOH  ',   &
         'NO2    ',  'NO3_X  ',  'NO3_L  ',  'N2O5   ',   &
@@ -323,9 +323,9 @@
         'BRO    ',  'BR2    ',  'HOBR   ',  'BRNO2  ',   &
         '1BRONO2',  '2BRONO2',  '1CLO   ',  '2CLO   ',   &
         'CL2    ',  'HOCL   ',  'CLNO2  ',  '1CLONO2',   &
-        '2CLONO2',  'BRCL   '                          &
+        '2CLONO2',  'BRCL   ',  'OCLO   '              &
          /
-        data (TQQ(1,JTMP), JTMP= 4,29)   &
+        data (TQQ(1,JTMP), JTMP= 4,30)   &
          /   &
          200.,   223.,   223.,   200.,   &
          200.,   200.,   200.,   225.,   &
@@ -333,9 +333,9 @@
          200.,   200.,   200.,   200.,   &
          230.,   230.,   200.,   200.,   &
          200.,   200.,   200.,   220.,   &
-         220.,   200.                    &
+         220.,   200.,   200.            &
          /
-        data (TQQ(2,JTMP), JTMP= 4,29)   &
+        data (TQQ(2,JTMP), JTMP= 4,30)   &
          /   &
          300.,   293.,   293.,   300.,   &
          300.,   300.,   300.,   300.,   &
@@ -343,7 +343,7 @@
          300.,   300.,   300.,   300.,   &
          298.,   298.,   300.,   300.,   &
          300.,   300.,   298.,   296.,   &
-         296.,   300.                    &
+         296.,   300.,   300.            &
          /
         data (QQQ(IW,1, 1), IW=1, 7)   &
          /   &
@@ -489,6 +489,12 @@
          4.536E-21,     8.749E-21,     1.626E-20,     3.170E-20,     &
          1.228E-19,     3.199E-19,     2.042E-20     &
          /
+        ! OCLO, from IUPAC
+        data (QQQ(IW,1,27), IW=1, 7)   &
+         /   &
+         3.308E-19,     2.347E-19,     1.566E-19 ,    1.174E-19,     &
+         4.242E-21,     1.065E-19,     1.951E-20     &
+         /
         data (QQQ(IW,2, 1), IW=1, 7)   &
          /   &
          0.98180E-20,   0.57350E-20,   0.37970E-20,   0.25850E-20,   &
@@ -632,6 +638,12 @@
          /   &
          4.536E-21,     8.749E-21,     1.626E-20,     3.170E-20,     &
          1.228E-19,     3.199E-19,     2.042E-20     &
+         /
+        ! OCLO, from IUPAC
+        data (QQQ(IW,2,27), IW=1, 7)   &
+         /   &
+         3.308E-19,     2.347E-19,     1.566E-19 ,    1.174E-19,     &
+         4.242E-21,     1.065E-19,     1.951E-20     &
          /
        data TITLE0(2)   &
          /   &
