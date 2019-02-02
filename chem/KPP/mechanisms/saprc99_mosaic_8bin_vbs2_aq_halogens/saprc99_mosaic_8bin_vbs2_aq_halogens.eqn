@@ -535,6 +535,7 @@
 {498} IO + ClO = I + OClO : RACM_THERMAL(TEMP,5.1D-12, -280.0_dp);
 {499} I2O2 + O3 = IxOy : RACM_THERMAL(TEMP,1.0D-12, 9770.0_dp);
 {500} OIO + OH = HIO3 : RACM_THERMAL(TEMP,4.72D-10, 0.0_dp); 
+{501} Br + CCHO = HBr + CCO_O2 : RACM_THERMAL(TEMP,1.8D-11, 460.0_dp);
 {s9}  HOCl = Cl2:  0.5*j(Pj_het_hocl);
 {s10} ClONO2 = Cl2 + HNO3:  0.27*j(Pj_het_clono2);
 {s11}  HOBr = Br2:  0.5*j(Pj_het_hobr);
