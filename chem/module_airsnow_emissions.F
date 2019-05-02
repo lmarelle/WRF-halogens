@@ -106,7 +106,9 @@ CONTAINS
       ! used in the whole routine also needs to be consistent with the one used
       ! to set ice-covered conditions in dry deposition (that is, the threshold
       ! used to set ivgtyp = is_ice)
-      IF (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.5) THEN
+      ! xice(i, j) .GT. 0.9 to avoid cases with high deposition because of
+      ! fractional sea ice
+      IF (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.9) THEN
         br2_emi = 0.0
 
         ! Br2 emissions occur only when the surface temperature is below Tcrit (-15°?). 
@@ -122,21 +124,23 @@ CONTAINS
           ! O3 deposition over first-year sea ice is converted to Br2 with a
           ! molar yield of 0.075 for SZA <= 85°
           !TODO add ice age, for now assume that all ice is first year ice
-          IF (coszen(i,j) .GE. 0.087 .AND. xice(i,j) .GE. 0.5 ) THEN
-            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075;
-          ELSEIF (coszen(i,j) .LT. 0.087 .AND. xice(i,j) .GE. 0.5 ) THEN
-            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001;
-          END IF ! coszen >= 0.087 <=> SZA <= 85°, and over ice
           !TODO O3 deposition is approx. 0.007 cm s-1 over snow/ice in basic
           !WRF-Chem, but Toyota et al. (2011) tuned it to approx. 0.01. To
           !reproduce their results it is thus probably better to adjust the
           !0.075 factor from Toyota et al. to 0.1
+          ! 0.075*0.01/0.007 ~= 0.1 because
+          ! O3 depvel in WRF-Chem is 0.007, lower than 0.01 in Toyota
+          IF (coszen(i,j) .GE. 0.087 .AND. xice(i,j) .GT. 0.9) THEN
+            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 0.01 / 0.007 * 2
+          ELSEIF (coszen(i,j) .LT. 0.087 .AND. xice(i,j) .GT. 0.9 ) THEN
+            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001 * 0.01 / 0.007 * 2
+          END IF ! coszen >= 0.087 <=> SZA <= 85°, and over ice
 
           !---- Br2 "recycling" release
 
           ! Over FY ice, HOBr and BrONO2 deposition gets converted to Br2
           !TODO add ice age, for now assume that all ice is first year ice
-          IF (xice(i,j) .GE. 0.5) THEN
+          IF (xice(i,j) .GT. 0.9) THEN
             br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
           END IF
 
@@ -149,11 +153,11 @@ CONTAINS
 
           ! Over continental snow, the smaller of both fluxes gets converted to
           ! Br2
-          !TODO make sure that this is not ocean/seaice. Technically, xice < 0.5
+          !TODO make sure that this is not ocean/seaice. Technically, xice < 0.9
           !should be enough to make sure that it is not a sea ice cell, and
           !there is no snow height over the open ocean, but it would be safer to
           !also use xland
-          IF (xice(i,j) .LT. 0.5 .AND. snowh(i, j) .GT. 0.01) THEN
+          IF (xice(i,j) .LE. 0.9 .AND. snowh(i, j) .GT. 0.01) THEN
             IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
               br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
             ELSE
@@ -173,7 +177,7 @@ CONTAINS
           emiss_br2(i, j) = emiss_br2(i, j) + br2_emi * dtstep
 
         END IF ! tsk <= tskcrit
-      END IF ! (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.5), snow or sea ice cell
+      END IF ! (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.9), snow or sea ice cell
 
     END DO ! i loop
   END DO ! j loop
