@@ -89,7 +89,7 @@ CONTAINS
   INTEGER :: i, j, k, isice_temp = 24
   ! Br2 emissions (moles/m2/s), Conversion factor from emissions to ppm,
   ! critical temperature for Br2 emissions & recycling (K)
-  REAL :: br2_emi = 0.0, conv, tskcrit = 258.15
+  REAL :: br2_emi = 0.0, conv, tskcrit = 273.15
 
 
 !-------- Add emissions --------
