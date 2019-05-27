@@ -124,16 +124,11 @@ CONTAINS
           ! O3 deposition over first-year sea ice is converted to Br2 with a
           ! molar yield of 0.075 for SZA <= 85°
           !TODO add ice age, for now assume that all ice is first year ice
-          !TODO O3 deposition is approx. 0.007 cm s-1 over snow/ice in basic
-          !WRF-Chem, but Toyota et al. (2011) tuned it to approx. 0.01. To
-          !reproduce their results it is thus probably better to adjust the
-          !0.075 factor from Toyota et al. to 0.1
-          ! 0.075*0.01/0.007 ~= 0.1 because
-          ! O3 depvel in WRF-Chem is 0.007, lower than 0.01 in Toyota
+          !TODO tuned up the factors by x5
           IF (coszen(i,j) .GE. 0.087 .AND. xice(i,j) .GT. 0.9) THEN
-            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 0.01 / 0.007 * 2
+            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 5
           ELSEIF (coszen(i,j) .LT. 0.087 .AND. xice(i,j) .GT. 0.9 ) THEN
-            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001 * 0.01 / 0.007 * 2
+            br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001 * 0.01 * 5
           END IF ! coszen >= 0.087 <=> SZA <= 85°, and over ice
 
           !---- Br2 "recycling" release
