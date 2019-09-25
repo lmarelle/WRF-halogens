@@ -135,6 +135,8 @@
 		id, curr_secs, ktau, dtstep, ktauc, dtstepc, config_flags, &
 		t_phy, rho_phy, p_phy,                            &
 		moist, chem, vbs_nbin,                            &
+                aer_ph_01, aer_ph_02, aer_ph_03, aer_ph_04, &
+                aer_ph_05, aer_ph_06, aer_ph_07, aer_ph_08, &
 		ids,ide, jds,jde, kds,kde,                        &
 		ims,ime, jms,jme, kms,kme,                        &
 		its,ite, jts,jte, kts,kte                         )
@@ -235,6 +237,11 @@
 !   chem - mixing ratios of trace gase (ppm) and aerosol species
 !	(ug/kg for mass species, #/kg for number species)
 
+   REAL, INTENT(INOUT), &
+       DIMENSION( ims:ime, kms:kme, jms:jme ) :: & 
+       aer_ph_01, aer_ph_02, aer_ph_03, aer_ph_04, &
+       aer_ph_05, aer_ph_06, aer_ph_07, aer_ph_08
+
 	type(grid_config_rec_type), intent(in) :: config_flags
 !   config_flags - configuration and control parameters
 
@@ -251,6 +258,12 @@
 !	integer, parameter :: aernewnuc_onoff = 1
 	integer :: aercoag_onoff = 1
 	integer :: aernewnuc_onoff = 1
+
+        integer :: kt
+        real :: aerosol_bin_ph
+        real, dimension(kms:kme) :: &
+        aer_ph_01_k, aer_ph_02_k, aer_ph_03_k, aer_ph_04_k, &
+        aer_ph_05_k, aer_ph_06_k, aer_ph_07_k, aer_ph_08_k
 	
 	real :: dtchem, dtcoag, dtnuc
 	real :: dum
@@ -445,11 +458,33 @@
 !	    call aerchem_debug_dump( 3, it, jt, dtchem )
 !	end if
 
+        aer_ph_01_k = aer_ph_01(it, :, jt)
+        aer_ph_02_k = aer_ph_02(it, :, jt)
+        aer_ph_03_k = aer_ph_03(it, :, jt)
+        aer_ph_04_k = aer_ph_04(it, :, jt)
+        aer_ph_05_k = aer_ph_05(it, :, jt)
+        aer_ph_06_k = aer_ph_06(it, :, jt)
+        aer_ph_07_k = aer_ph_07(it, :, jt)
+        aer_ph_08_k = aer_ph_08(it, :, jt)
+
 	if (idiagaa_dum > 0)   &
  	print 93010, 'calling aerchem - it,jt,maerchem =', it, jt, maerchem
 !	print 93010, 'calling aerchem - it,jt,maerchem =', it, jt, maerchem
 	call aerchemistry( it, jt, kclm_calcbgn, kclm_calcend,   &
+                           aer_ph_01_k, aer_ph_02_k, aer_ph_03_k, aer_ph_04_k, &
+                           aer_ph_05_k, aer_ph_06_k, aer_ph_07_k, aer_ph_08_k, &
+                           kds, kde, kms, kme, kts, kte, &
                            dtchem, idiagaa_dum, vbs_nbin )
+
+        aer_ph_01(it, :, jt) = aer_ph_01_k
+        aer_ph_02(it, :, jt) = aer_ph_02_k
+        aer_ph_03(it, :, jt) = aer_ph_03_k
+        aer_ph_04(it, :, jt) = aer_ph_04_k
+        aer_ph_05(it, :, jt) = aer_ph_05_k
+        aer_ph_06(it, :, jt) = aer_ph_06_k
+        aer_ph_07(it, :, jt) = aer_ph_07_k
+        aer_ph_08(it, :, jt) = aer_ph_08_k
+
 
 !  note units for aerosol is now ug/m3
 

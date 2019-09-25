@@ -91,11 +91,15 @@
 ! update: jan 2005
 !-----------------------------------------------------------------------
       subroutine aerchemistry( iclm, jclm, kclm_calcbgn, kclm_calcend,   &
+                           aer_ph_01_k, aer_ph_02_k, aer_ph_03_k, aer_ph_04_k, &
+                           aer_ph_05_k, aer_ph_06_k, aer_ph_07_k, aer_ph_08_k, &
+                           kds, kde, kms, kme, kts, kte, &
                                dtchem_sngl, idiagaa,vbs_nbin )
 
       use module_data_mosaic_asect
       use module_data_mosaic_other
       use module_mosaic_movesect, only:  move_sections
+      use module_data_mosaic_therm, only: mc, jc_h
 
 !     implicit none
 !     include 'v33com'
@@ -105,11 +109,16 @@
 !   subr arguments
       integer iclm, jclm, kclm_calcbgn, kclm_calcend, idiagaa,vbs_nbin(1)
       real dtchem_sngl
+      integer kds, kde, kms, kme, kts, kte
+     REAL, INTENT(INOUT), &
+        DIMENSION( kms:kme ) :: & 
+        aer_ph_01_k, aer_ph_02_k, aer_ph_03_k, aer_ph_04_k, &
+        aer_ph_05_k, aer_ph_06_k, aer_ph_07_k, aer_ph_08_k
 !   local variables
       real(kind=8) :: dtchem
       integer k, m
-
-
+      integer isize
+      real aerosol_ph
 
       dtchem = dtchem_sngl
 
@@ -135,6 +144,28 @@
           istat_mosaic_fe1 = 1
 
           call mosaic( k, m, dtchem,vbs_nbin)
+
+          ! LMarelle - calculate pH
+          do isize = 1,nbin_a
+            aerosol_ph  = MIN(14.0D0, MAX(0.0D0, -log10(mc(jc_h,isize)) ))
+            if (isize == 1) then
+              aer_ph_01_k(k) = aerosol_ph
+            elseif (isize == 2) then
+              aer_ph_02_k(k) = aerosol_ph
+            elseif (isize == 3) then
+              aer_ph_03_k(k) = aerosol_ph
+            elseif (isize == 4) then
+              aer_ph_04_k(k) = aerosol_ph
+            elseif (isize == 5) then
+              aer_ph_05_k(k) = aerosol_ph
+            elseif (isize == 6) then
+              aer_ph_06_k(k) = aerosol_ph
+            elseif (isize == 7) then
+              aer_ph_07_k(k) = aerosol_ph
+            elseif (isize == 8) then
+              aer_ph_08_k(k) = aerosol_ph
+            endif
+          end do
 
           if (istat_mosaic_fe1 .lt. 0) then
              nfe1_mosaic_cur = nfe1_mosaic_cur + 1

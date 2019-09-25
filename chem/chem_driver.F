@@ -1228,6 +1228,8 @@
         grid%ph_het_hobr, grid%ph_het_brono2, grid%ph_het_hcl,         &
         grid%ph_het_hbr, grid%ph_het_n2o5, grid%ph_het_hocl,           &
         grid%ph_het_clono2, grid%ph_het_oh,                            &
+        grid%aer_ph_01, grid%aer_ph_02, grid%aer_ph_03, grid%aer_ph_04, &
+        grid%aer_ph_05, grid%aer_ph_06, grid%aer_ph_07, grid%aer_ph_08, &
         ids,ide, jds,jde, kds,kde,                                     &
         ims,ime, jms,jme, kms,kme,                                     &
         its,ite, jts,jte, kts,kte                                      )
@@ -1611,6 +1613,8 @@ if ( cam_mam_aerosols ) &
               vdrog3,vdrog3_vbs,grid%br_rto,grid%dgnum4d,grid%dgnumwet4d,wetdens_ap,  &
               del_h2so4_gasprod,grid%dvmrdt_sv13d,grid%dvmrcwdt_sv13d,                &
               grid%is_CAMMGMP_used,                                                   &
+              grid%aer_ph_01, grid%aer_ph_02, grid%aer_ph_03, grid%aer_ph_04, &
+              grid%aer_ph_05, grid%aer_ph_06, grid%aer_ph_07, grid%aer_ph_08, &
               ids,ide, jds,jde, kds,kde,                                              &
               ims,ime, jms,jme, kms,kme,                                              &
               its,ite,jts,jte,kts,kte                                                 )
