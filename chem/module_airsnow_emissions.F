@@ -20,6 +20,13 @@
 ! For now, this is only coupled to the SAPRC99_MOSAIC_8BIN_VBS2_AQ_HALOGENS_KPP
 ! gas-phase/aerosol mechanism 
 !
+!TODO change the critical temperature to OK but include a memory to this,
+!everytime the temperature rises above 0K or if liquid rain falls bromine
+!emissions and recycling are turned off, until new snow falls again and
+!temperatures are below 0K.
+!TODO 
+! - If someone tries to use this option with another mechanism include a call
+! to WRF_FATAL in chemics_init.F.
 ! TODO This is hardcoded to USGS for now read in IVGTYP and MMINLU, abort if
 ! MMINLU is not USGS. Also, determine if land type is sea ice by reading xice .gt. 0
 ! and ivgtyp .eq. isice, determine if land snow by xice .eq. 0 and ivgtyp .ne.
@@ -34,7 +41,7 @@ CONTAINS
   SUBROUTINE  airsnow_emissions( id, dtstep, dz8w, rho_phy,         &
          chem, snowh, snowc, tsk, xice, coszen, drydepflx_o3,       &
          drydepflx_hobr, drydepflx_brno3, drydepflx_hbr,            &
-         drydepflx_br2,                                             &
+         drydepflx_br2, emiss_br2,                                  &
          ids,ide, jds,jde, kds,kde,                                 &
          ims,ime, jms,jme, kms,kme,                                 &
          its,ite, jts,jte, kts,kte                                  )
@@ -69,6 +76,10 @@ CONTAINS
         INTENT(IN) :: drydepflx_o3, drydepflx_hobr,               &
         drydepflx_brno3, drydepflx_hbr, drydepflx_br2
 
+  ! Accumulated br2 emission flux (mol/m2)
+  REAL, DIMENSION(ims:ime, jms:jme)               ,               &
+        INTENT(INOUT) :: emiss_br2
+
   ! Trace species mixing ratios (gases in ppm, aerosols in microg/m3)
   REAL, DIMENSION(ims:ime, kms:kme, jms:jme, num_chem),           &
         INTENT(INOUT) :: chem
@@ -76,7 +87,7 @@ CONTAINS
   ! Local variables
   ! Loop indices i j k, ice landuse category
   INTEGER :: i, j, k, isice_temp = 24
-  ! Br2 emissions (moles/km2/s), Conversion factor from emissions to ppm,
+  ! Br2 emissions (moles/m2/s), Conversion factor from emissions to ppm,
   ! critical temperature for Br2 emissions & recycling (K)
   REAL :: br2_emi = 0.0, conv, tskcrit = 258.15
 
@@ -157,6 +168,9 @@ CONTAINS
           ! (i.e., emissions tendencies over time dtstep are applied 
           ! to the surface trace gas concentrations)
           chem(i, kts, j, p_br2) = chem(i, kts, j, p_br2) + br2_emi * conv
+
+          ! Output diagnosis, accumulated br2 emissions in mol/m2
+          emiss_br2(i, j) = emiss_br2(i, j) + br2_emi * dtstep
 
         END IF ! tsk <= tskcrit
       END IF ! (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.5), snow or sea ice cell
