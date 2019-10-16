@@ -18,7 +18,7 @@ CONTAINS
 !  scavenging of gas-phase gases by mass transfer and reaction
 
 !----------------------------------------------------------------------
-   USE module_configure, only: grid_config_rec_type
+   USE module_configure, only: grid_config_rec_type, p_hbr
    USE module_state_description
    USE module_data_mosaic_asect
 
@@ -57,6 +57,11 @@ CONTAINS
    REAL, DIMENSION( ims:ime, jms:jme, num_chem ),          &
          INTENT(OUT ) ::                                qsrflx ! column change due to scavening
 
+   !LMarelle - add first-order HBr impaction scavenging
+   INTEGER :: i,k,j
+   REAL :: hbr_scav, prect
+   REAL, PARAMETER :: HBR_SCAV_RATE = 3.89E-4 ! s-1 / (mm h-1)
+
    call wetscav (id,ktau,dtstep,ktauc,config_flags,                      &
         dtstepc,alt,t_phy,p8w,t8w,p_phy,chem,rho_phy,cldfra,             &
         qlsink,precr,preci,precs,precg,qsrflx,                           &
@@ -70,6 +75,28 @@ CONTAINS
         ids,ide, jds,jde, kds,kde,                                       &
         ims,ime, jms,jme, kms,kme,                                       &
         its,ite, jts,jte, kts,kte                                        )
+
+   !LMarelle - special case for halogen mechanism - remove HBr using a
+   !first-order scavenging rate of (3.89×10−4 s−1 per mmh−1, Toyota et al., ACP,
+   !2011)
+   IF (config_flags%chem_opt == SAPRC99_MOSAIC_8BIN_VBS2_AQ_HALOGENS_KPP) THEN
+     DO j=jts,jte
+       DO k=kts,kte
+         DO i=its,ite
+           ! prec is in kg/m2/s = mm/s
+           prect = precr(i, k, j) + preci(i, k, j) + precs(i, k, j) + precg(i, k, j)
+           IF (prect > 0.0)
+             !TODO ignore below a certain concentration, set to smallval instead
+             !of 0.0
+             hbr_scav = prect * HBR_SCAV_RATE * 3600. ! s-1
+             ! Update chem
+             chem(i, k, j, p_hbr) = chem(i, k, j, p_hbr) * (1.0 - hbr_scav * dtstepc)
+             chem(i, k, j, p_hbr) = MAX(chem(i, k, j, p_hbr), 0.0)
+           END IF
+         END DO
+       END DO
+     END DO
+   END IF
 
    end subroutine wetscav_cbmz_mosaic
 
