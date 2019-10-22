@@ -85,7 +85,7 @@ CONTAINS
          DO i=its,ite
            ! prec is in kg/m2/s = mm/s
            prect = precr(i, k, j) + preci(i, k, j) + precs(i, k, j) + precg(i, k, j)
-           IF (prect > 0.0)
+           IF (prect > 0.0) THEN
              !TODO ignore below a certain concentration, set to smallval instead
              !of 0.0
              hbr_scav = prect * HBR_SCAV_RATE * 3600. ! s-1
