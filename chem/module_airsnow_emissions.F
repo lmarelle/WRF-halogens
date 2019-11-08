@@ -216,8 +216,8 @@ CONTAINS
         IF (tsk(i, j) .LE. tskcrit) THEN
 
           ! Br2 deposition is reemitted directly over snow and ice (meaning it
-          ! is not deposited)
-          br2_emi = br2_emi + drydepflx_br2(i,j)
+          ! is not deposited) - NOW DONE IN DEP DRIVER
+          ! br2_emi = br2_emi + drydepflx_br2(i,j)
 
           !----- Br2 "trigger" release
 
@@ -255,13 +255,13 @@ CONTAINS
           !0.01 should be enough to make sure that it is not a sea ice cell, and
           !there is no snow height over the open ocean, but it would be safer to
           !also use xland
-          IF (xice(i,j) .LE. 0.01 .AND. snowh(i, j) .GT. 0.01) THEN
-            IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
-              br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
-            ELSE
-              br2_emi = br2_emi + drydepflx_hbr(i,j)
-            END IF
-          END IF
+          ! IF (xice(i,j) .LE. 0.01 .AND. snowh(i, j) .GT. 0.01) THEN
+          !   IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
+          !     br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
+          !   ELSE
+          !     br2_emi = br2_emi + drydepflx_hbr(i,j)
+          !   END IF
+          ! END IF
         END IF ! tsk <= tskcrit
       END IF ! (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.9), snow or sea ice cell
 
