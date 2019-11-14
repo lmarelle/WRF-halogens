@@ -381,8 +381,9 @@ tile_lon_loop : &
         do j=jts,jte
           do i=its,ite
             ! THEN ddvel(p_br2) = 0
-            IF (tsk(i, j) .LE. tskcrit_halogens .AND. (((snowh(i, j) .GT. 0.01 &
-                .AND. xice(i, j) .LE. 0.01) .OR. xice(i, j) .GT. 0.9)) ) THEN
+            IF (tsk(i, j) .LE. tskcrit_halogens .AND. xice(i, j) .GT. 0.9) THEN
+            ! IF (tsk(i, j) .LE. tskcrit_halogens .AND. (((snowh(i, j) .GT. 0.01 &
+            !     .AND. xice(i, j) .LE. 0.01) .OR. xice(i, j) .GT. 0.9)) ) THEN
               ddvel(i, j, p_br2) = 0.0
             END IF
             ddvel(i,j,p_c2h6)    = 0.

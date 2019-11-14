@@ -36,7 +36,12 @@
 !TODO add checks for numerical issues, eg divisions
 !
 !TODO, write down assumptions, e.g. it's a MOSAIC module with the standard 8
-!size bins, maybe compare the bin sizes to what I assumed offline
+!size bins, maybe compare the bin sizes to what I assumed offline, needs seaice
+!age
+!
+!TODO add a check for lake ice
+!
+!TODO add BrCl emissions
 !
 !TODO define all variables and units in declaration section
 ! Check all units !
@@ -56,8 +61,9 @@ CONTAINS
 
 !----------------------------------------------------------------------
   SUBROUTINE airsnow_emissions( id, dtstep, dz8w, moist, t_phy, p_phy, u_phy, &
-         v_phy, rho_phy, chem, u10, v10, ust, T2, snowh, tsk,   &
-         xice, coszen, drydepflx_o3, drydepflx_hobr, drydepflx_brno3,  &
+         v_phy, rho_phy, chem, u10, v10, ust, T2, snowh, tsk,          &
+         xice, seaice_age, coszen,                                     &
+         drydepflx_o3, drydepflx_hobr, drydepflx_brno3,                &
          drydepflx_hbr, drydepflx_br2, emiss_br2,                      &
          ids,ide, jds,jde, kds,kde,                                    &
          ims,ime, jms,jme, kms,kme,                                    &
@@ -94,9 +100,10 @@ CONTAINS
 
   ! 10m-x-direction-windspeed (m/s), 10m-y-direction-windspeed (m/s), friction
   ! velocity (m/s), 2m-temperature (K), Snow height (m), skin temperature (K),
-  ! ice fraction (0-1), cosine of solar zenith angle (dimensionless)
+  ! ice fraction (0-1), cosine of solar zenith angle (dimensionless), sea ice
+  ! age (no unit, flag)
   REAL, DIMENSION(ims:ime, jms:jme)               ,               &
-        INTENT(IN) :: u10, v10, ust, t2, snowh, tsk, xice, coszen
+        INTENT(IN) :: u10, v10, ust, t2, snowh, tsk, xice, coszen, seaice_age
 
   ! Dry deposition fluxes of O3, HOBr, BrNO3, and HBr (mole/m2/s), calculated in
   ! dry_dep_driver
@@ -116,10 +123,10 @@ CONTAINS
   CHARACTER (LEN=1000) :: msg
   ! Loop indices i j k, ice landuse category
   INTEGER :: i, j, k, isice_temp = 24
-  ! Br2 emissions (mole/m2/s), Conversion factor from emissions to ppm, from
+  ! Br2 and BrCl emissions (mole/m2/s), Conversion factor from emissions to ppm, from
   ! emissions to µg/kg, critical temperature for Br2
   ! emissions & recycling (K)
-  REAL :: br2_emi = 0.0, conv, conv2, tskcrit = 273.15
+  REAL :: br2_emi = 0.0, brcl_emi = 0.0, conv, conv2, tskcrit = 273.15
 
   !---- Local variables for the blowing snow model
   INTEGER, PARAMETER :: naersizes = 8
@@ -193,6 +200,7 @@ CONTAINS
   DO j = jts,jte
     DO i = its,ite
       br2_emi = 0.0
+      brcl_emi = 0.0
       nacl_emi = 0.0
       aer_num_change = 0.0
 
@@ -221,10 +229,9 @@ CONTAINS
 
           !----- Br2 "trigger" release
 
-          IF (do_snow_emissions) THEN
+          IF (do_snow_emissions .AND. seaice_age(i,j) < 1.5) THEN
             ! O3 deposition over first-year sea ice is converted to Br2 with a
             ! molar yield of 0.075 for SZA <= 85°
-            !TODO add ice age, for now assume that all ice is first year ice
             !TODO tuned up the factors by x10
             IF (coszen(i,j) .GE. 0.087 .AND. xice(i,j) .GT. 0.9) THEN
               br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 10
@@ -236,18 +243,25 @@ CONTAINS
 
           !---- Br2 "recycling" release
 
-          ! Over FY ice, HOBr and BrONO2 deposition gets converted to Br2
-          !TODO add ice age, for now assume that all ice is first year ice
-          IF (xice(i,j) .GT. 0.9) THEN
+          IF (xice(i,j) .GT. 0.9 .AND. seaice_age(i,j) < 1.5) THEN
+            ! Over FY ice, HOBr and BrONO2 deposition gets converted to Br2
             br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
-          END IF
 
-          !TODO Over MY ice, 2 cases. Need to add ice age to do this.
-          !   1 - if HOBr+BrONO2 deposition <= HBr deposition, it gets converted to
-          !   Br2
-          !   2 - if HOBr+BrONO2 deposition > HBr deposition, an amount of [HBr]
-          !   gets converted to Br2 and the excess part gets converted to BrCl
-          !   (or 50% Br2 if there is no chlorine in the mechanism)
+          ELSEIF (xice(i,j) .GT. 0.9 .AND. seaice_age(i,j) >= 1.5) THEN
+            !TODO Over MY ice, 2 cases
+            !   1 - if HOBr+BrONO2 deposition <= HBr deposition, it gets converted to
+            !   Br2
+            !   2 - if HOBr+BrONO2 deposition > HBr deposition, an amount of [HBr]
+            !   gets converted to Br2 and the excess part gets converted to BrCl
+            !   (or 50% Br2 if there is no chlorine in the mechanism)
+            IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
+              br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
+            ELSE
+              br2_emi = br2_emi + drydepflx_hbr(i,j)
+              brcl_emi = brcl_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j) - drydepflx_hbr(i,j))
+            END IF
+
+          END IF
 
           ! Over continental snow, the smaller of both fluxes gets converted to
           ! Br2
@@ -371,6 +385,13 @@ CONTAINS
           chem(i,kts,j,p_br2) = 0.0
         ELSE
           chem(i,kts,j,p_br2) = chem(i,kts,j,p_br2) + br2_emi * conv
+        END IF
+        ! Add BrCl emissions
+        IF (chem(i,kts,j,p_brcl)  + brcl_emi * conv <= 0) THEN
+          brcl_emi = - chem(i,kts,j,p_brcl) / conv
+          chem(i,kts,j,p_brcl) = 0.0
+        ELSE
+          chem(i,kts,j,p_brcl) = chem(i,kts,j,p_brcl) + brcl_emi * conv
         END IF
 
         !---- Output diagnosis, accumulated br2 emissions in mole/m2
