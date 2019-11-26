@@ -145,7 +145,7 @@ SUBROUTINE wesely_driver( id, ktau, dtstep, config_flags, current_month,  &
 ! .. Local Scalars
 !--------------------------------------------------
       REAL    ::  clwchem, dvfog, dvpart, pa, rad, dep_vap
-      REAL    ::  rhchem, ta, ustar, vegfrac, z1, zntt, tskcrit_halogens = 273.15
+      REAL    ::  rhchem, ta, ustar, vegfrac, z1, zntt
       INTEGER :: i, iland, iprt, iseason, j, jce, jcs, n, nr, ipr,jpr,nvr
       LOGICAL :: highnh3, rainflag, vegflag, wetflag
       LOGICAL :: chm_is_moz
@@ -380,12 +380,6 @@ tile_lon_loop : &
       if( config_flags%chem_opt == SAPRC99_MOSAIC_8BIN_VBS2_AQ_HALOGENS_KPP ) then
         do j=jts,jte
           do i=its,ite
-            ! THEN ddvel(p_br2) = 0
-            IF (tsk(i, j) .LE. tskcrit_halogens .AND. xice(i, j) .GT. 0.9) THEN
-            ! IF (tsk(i, j) .LE. tskcrit_halogens .AND. (((snowh(i, j) .GT. 0.01 &
-            !     .AND. xice(i, j) .LE. 0.01) .OR. xice(i, j) .GT. 0.9)) ) THEN
-              ddvel(i, j, p_br2) = 0.0
-            END IF
             ddvel(i,j,p_c2h6)    = 0.
             ddvel(i, j, p_oclo) = 0.0
             ddvel(i, j, p_cl) = 0.0

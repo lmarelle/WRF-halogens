@@ -232,11 +232,11 @@ CONTAINS
           IF (do_snow_emissions .AND. seaice_age(i,j) < 1.5) THEN
             ! O3 deposition over first-year sea ice is converted to Br2 with a
             ! molar yield of 0.075 for SZA <= 85°
-            !TODO tuned up the factors by x10
+            !TODO tuned up the factors by x5
             IF (coszen(i,j) .GE. 0.087 .AND. xice(i,j) .GT. 0.9) THEN
-              br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 10
+              br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 5
             ELSEIF (coszen(i,j) .LT. 0.087 .AND. xice(i,j) .GT. 0.9 ) THEN
-              br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001 * 0.01 * 10
+              br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001 * 0.01 * 5
 
             END IF ! coszen >= 0.087 <=> SZA <= 85°, and over ice
           END IF ! do_snow_emissions
@@ -269,13 +269,13 @@ CONTAINS
           !0.01 should be enough to make sure that it is not a sea ice cell, and
           !there is no snow height over the open ocean, but it would be safer to
           !also use xland
-          ! IF (xice(i,j) .LE. 0.01 .AND. snowh(i, j) .GT. 0.01) THEN
-          !   IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
-          !     br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
-          !   ELSE
-          !     br2_emi = br2_emi + drydepflx_hbr(i,j)
-          !   END IF
-          ! END IF
+          IF (xice(i,j) .LE. 0.01 .AND. snowh(i, j) .GT. 0.01) THEN
+            IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
+              br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
+            ELSE
+              br2_emi = br2_emi + drydepflx_hbr(i,j)
+            END IF
+          END IF
         END IF ! tsk <= tskcrit
       END IF ! (snowh(i, j) .GT. 0.01 .OR. xice(i, j) .GT. 0.9), snow or sea ice cell
 
