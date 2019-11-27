@@ -54,6 +54,8 @@
 ! - If someone tries to use this option with another mechanism include a call
 ! to WRF_FATAL in chemics_init.F.
 ! - Write a caveat for lake ice, which should not emit Br2.
+! - TODO write a caveat for mountain ice
+! - TODO call to fatal if seaice_age is not included
 
 MODULE module_airsnow_emissions
 
@@ -193,6 +195,8 @@ CONTAINS
                          0.0965, 0.3379, 0.2332, 0.1393  /)
   do_snow_emissions = .true.
   do_blowing_snow = .true.
+  itype = 1
+  iphase = ai_phase
 
   !-------- Add emissions from snow, recycling and blowing snow --------
   ! From Toyoyota et al. (2011) and Yang et al. (2008)
@@ -349,8 +353,6 @@ CONTAINS
 
       !-------- Add Br2 emissions from airsnow and blowing snow, and sea salt emissions from blowing snow  --------
       !TODO Add p1st checks and variables everywhere in the module
-      itype = 1
-      iphase = ai_phase
 
       ! Conversion factor from mole/m2/s to ppm
       conv = 1.0E3 * mwdry / rho_phy(i,kts,j) * dtstep / (dz8w(i,kts,j))
