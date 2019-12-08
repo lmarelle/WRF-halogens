@@ -65,7 +65,7 @@ CONTAINS
          ic_flashrate, cg_flashrate,                                       &
          ! end stuff for LNOx emissions
          ! stuff for Br2 emissions from snow
-         snowc, xice, coszen,                                  &
+         snowc, xice, meltedsnow, coszen,                                  &
          drydepflx_o3, drydepflx_hobr,                                     &
          drydepflx_brno3, drydepflx_hbr, drydepflx_br2, emiss_br2,         &
          ! stuff for aircraft emissions
@@ -340,7 +340,7 @@ CONTAINS
       REAL, DIMENSION(ims:ime, jms:jme), INTENT(IN) :: snowc, xice, coszen, drydepflx_o3, &
                             drydepflx_hobr, drydepflx_brno3, drydepflx_hbr, drydepflx_br2
   REAL, DIMENSION(ims:ime, jms:jme)               ,               &
-        INTENT(INOUT) :: emiss_br2
+        INTENT(INOUT) :: emiss_br2, meltedsnow
 
 !
 ! Local variables...
@@ -798,7 +798,7 @@ CONTAINS
         CALL wrf_debug(15, 'Br2 emissions from snow')
         CALL airsnow_emissions( id, dtstep, dz8w, moist, t_phy, p_phy, u_phy, &
          v_phy, rho_phy, chem, u10, v10, ust, T2, snowh, tsk,          &
-         xice, coszen,                                     &
+         xice, meltedsnow, coszen,                                     &
          drydepflx_o3, drydepflx_hobr, drydepflx_brno3,                &
          drydepflx_hbr, drydepflx_br2, emiss_br2,                      &
          ids,ide, jds,jde, kds,kde,                                    &

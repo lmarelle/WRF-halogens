@@ -62,7 +62,7 @@ CONTAINS
 !----------------------------------------------------------------------
   SUBROUTINE airsnow_emissions( id, dtstep, dz8w, moist, t_phy, p_phy, u_phy, &
          v_phy, rho_phy, chem, u10, v10, ust, T2, snowh, tsk,          &
-         xice, coszen,                                     &
+         xice, meltedsnow, coszen,                                     &
          drydepflx_o3, drydepflx_hobr, drydepflx_brno3,                &
          drydepflx_hbr, drydepflx_br2, emiss_br2,                      &
          ids,ide, jds,jde, kds,kde,                                    &
@@ -103,6 +103,9 @@ CONTAINS
   ! ice fraction (0-1), cosine of solar zenith angle (dimensionless)
   REAL, DIMENSION(ims:ime, jms:jme)               ,               &
         INTENT(IN) :: u10, v10, ust, t2, snowh, tsk, xice, coszen
+  ! Past snow melt flag (dimensionless)
+  REAL, DIMENSION(ims:ime, jms:jme)               ,               &
+        INTENT(INOUT) :: meltedsnow
 
   ! Dry deposition fluxes of O3, HOBr, BrNO3, and HBr (mole/m2/s), calculated in
   ! dry_dep_driver
@@ -208,7 +211,7 @@ CONTAINS
       a_prime = 1.0 / (1.038 + 0.03758 * snow_age - 0.00014349 * snow_age ** 2.0 &
                 + 1.911315E-7 * snow_age ** 3.0)
 
-      !-------- Halogen emissions from snow and recycling over snow
+      !-------- Halogen emissions from surface snow and recycling over snow
       ! Only valid over snow or over sea ice (assuming that ice is always snow
       ! covered below tskcrit, this may not be true for land ice in the
       ! Antarctic)
@@ -219,7 +222,16 @@ CONTAINS
       ! used to set ivgtyp = is_ice)
       ! xice(i, j) .GT. 0.9 to avoid cases with high deposition because of
       ! fractional sea ice
-      IF ((snowh(i, j) .GT. 0.01 .AND. xice(i, j) .LE. 0.01) .OR. xice(i, j) .GT. 0.9) THEN
+      IF (((snowh(i, j) .GT. 0.01 .AND. xice(i, j) .LE. 0.01) .OR. xice(i, j) .GT. 0.9) .AND. meltedsnow(i,j) .LE. 0.5) THEN
+        ! If snow melts, turn off surface emissions there for the rest of the
+        ! simulation 
+        !TODO also use this for blowing snow !TODO snow might need to melt for
+        !some time (K. Toyota uses 6h continuous melt) !TODO this needs to be
+        !reset in the fall, e.g. when sea-ice reforms in october and later or
+        !with snow fall !TODO this should ideally drift with sea ice
+        IF(tsk(i, j) .GT. 273) THEN
+          meltedsnow(i,j) = 1.
+        ENDIF
 
         ! Br2 emissions occur only when the surface temperature is below Tcrit
         IF (tsk(i, j) .LE. tskcrit) THEN
@@ -232,14 +244,14 @@ CONTAINS
 
           IF (do_snow_emissions) THEN
             ! O3 deposition over first-year sea ice is converted to Br2 with a
-            ! molar yield of 0.075 for SZA <= 85°
+            ! molar yield of 0.075 for SZA <= 90°
             !TODO tuned up the factors by x5
-            IF (coszen(i,j) .GE. 0.087 .AND. xice(i,j) .GT. 0.9) THEN
+            IF (coszen(i,j) .GE. 0.0 .AND. xice(i,j) .GT. 0.9) THEN
               br2_emi = br2_emi + drydepflx_o3(i,j) * 0.075 * 5
-            ELSEIF (coszen(i,j) .LT. 0.087 .AND. xice(i,j) .GT. 0.9 ) THEN
+            ELSEIF (coszen(i,j) .LT. 0.0 .AND. xice(i,j) .GT. 0.9 ) THEN
               br2_emi = br2_emi + drydepflx_o3(i,j) * 0.001 * 0.01 * 5
 
-            END IF ! coszen >= 0.087 <=> SZA <= 85°, and over ice
+            END IF ! coszen >= 0.0 <=> SZA <= 90°, and over ice
           END IF ! do_snow_emissions
 
           !---- Br2 "recycling" release
