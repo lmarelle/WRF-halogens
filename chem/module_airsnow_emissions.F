@@ -229,7 +229,7 @@ CONTAINS
         !some time (K. Toyota uses 6h continuous melt) !TODO this needs to be
         !reset in the fall, e.g. when sea-ice reforms in october and later or
         !with snow fall !TODO this should ideally drift with sea ice
-        IF(tsk(i, j) .GT. 273) THEN
+        IF(tsk(i, j) .GT. 273.15) THEN
           meltedsnow(i,j) = 1.
         ENDIF
 
