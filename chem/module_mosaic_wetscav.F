@@ -18,7 +18,8 @@ CONTAINS
 !  scavenging of gas-phase gases by mass transfer and reaction
 
 !----------------------------------------------------------------------
-   USE module_configure, only: grid_config_rec_type, p_hbr
+   USE module_configure, only: grid_config_rec_type, p_hbr, p_hobr, p_hocl, &
+                               p_brono2, p_clono2
    USE module_state_description
    USE module_data_mosaic_asect
 
@@ -92,6 +93,16 @@ CONTAINS
              ! Update chem
              chem(i, k, j, p_hbr) = chem(i, k, j, p_hbr) * (1.0 - hbr_scav * dtstepc)
              chem(i, k, j, p_hbr) = MAX(chem(i, k, j, p_hbr), 0.0)
+             ! Also remove HOBr, BrONO2, HOCl, CLONO2, assuming the same first
+             ! order rate
+             chem(i, k, j, p_hobr) = chem(i, k, j, p_hobr) * (1.0 - hbr_scav * dtstepc)
+             chem(i, k, j, p_hobr) = MAX(chem(i, k, j, p_hobr), 0.0)
+             chem(i, k, j, p_brono2) = chem(i, k, j, p_brono2) * (1.0 - hbr_scav * dtstepc)
+             chem(i, k, j, p_brono2) = MAX(chem(i, k, j, p_brono2), 0.0)
+             chem(i, k, j, p_hocl) = chem(i, k, j, p_hocl) * (1.0 - hbr_scav * dtstepc)
+             chem(i, k, j, p_hocl) = MAX(chem(i, k, j, p_hocl), 0.0)
+             chem(i, k, j, p_clono2) = chem(i, k, j, p_clono2) * (1.0 - hbr_scav * dtstepc)
+             chem(i, k, j, p_clono2) = MAX(chem(i, k, j, p_clono2), 0.0)
            END IF
          END DO
        END DO
