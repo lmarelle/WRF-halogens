@@ -36,8 +36,7 @@
 !TODO add checks for numerical issues, eg divisions
 !
 !TODO, write down assumptions, e.g. it's a MOSAIC module with the standard 8
-!size bins, maybe compare the bin sizes to what I assumed offline, needs seaice
-!age
+!size bins, maybe compare the bin sizes to what I assumed offline
 !
 !TODO add a check for lake ice
 !
@@ -55,7 +54,6 @@
 ! to WRF_FATAL in chemics_init.F.
 ! - Write a caveat for lake ice, which should not emit Br2.
 ! - TODO write a caveat for mountain ice
-! - TODO call to fatal if seaice_age is not included
 
 MODULE module_airsnow_emissions
 
@@ -64,7 +62,7 @@ CONTAINS
 !----------------------------------------------------------------------
   SUBROUTINE airsnow_emissions( id, dtstep, dz8w, moist, t_phy, p_phy, u_phy, &
          v_phy, rho_phy, chem, u10, v10, ust, T2, snowh, tsk,          &
-         xice, seaice_age, coszen,                                     &
+         xice, coszen,                                     &
          drydepflx_o3, drydepflx_hobr, drydepflx_brno3,                &
          drydepflx_hbr, drydepflx_br2, emiss_br2,                      &
          ids,ide, jds,jde, kds,kde,                                    &
@@ -102,10 +100,9 @@ CONTAINS
 
   ! 10m-x-direction-windspeed (m/s), 10m-y-direction-windspeed (m/s), friction
   ! velocity (m/s), 2m-temperature (K), Snow height (m), skin temperature (K),
-  ! ice fraction (0-1), cosine of solar zenith angle (dimensionless), sea ice
-  ! age (no unit, flag)
+  ! ice fraction (0-1), cosine of solar zenith angle (dimensionless)
   REAL, DIMENSION(ims:ime, jms:jme)               ,               &
-        INTENT(IN) :: u10, v10, ust, t2, snowh, tsk, xice, coszen, seaice_age
+        INTENT(IN) :: u10, v10, ust, t2, snowh, tsk, xice, coszen
 
   ! Dry deposition fluxes of O3, HOBr, BrNO3, and HBr (mole/m2/s), calculated in
   ! dry_dep_driver
@@ -233,7 +230,7 @@ CONTAINS
 
           !----- Br2 "trigger" release
 
-          IF (do_snow_emissions .AND. seaice_age(i,j) < 1.5) THEN
+          IF (do_snow_emissions) THEN
             ! O3 deposition over first-year sea ice is converted to Br2 with a
             ! molar yield of 0.075 for SZA <= 85°
             !TODO tuned up the factors by x5
@@ -247,23 +244,25 @@ CONTAINS
 
           !---- Br2 "recycling" release
 
-          IF (xice(i,j) .GT. 0.9 .AND. seaice_age(i,j) < 1.5) THEN
+          IF (xice(i,j) .GT. 0.9) THEN
             ! Over FY ice, HOBr and BrONO2 deposition gets converted to Br2
             br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
 
-          ELSEIF (xice(i,j) .GT. 0.9 .AND. seaice_age(i,j) >= 1.5) THEN
-            !TODO Over MY ice, 2 cases
-            !   1 - if HOBr+BrONO2 deposition <= HBr deposition, it gets converted to
-            !   Br2
-            !   2 - if HOBr+BrONO2 deposition > HBr deposition, an amount of [HBr]
-            !   gets converted to Br2 and the excess part gets converted to BrCl
-            !   (or 50% Br2 if there is no chlorine in the mechanism)
-            IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
-              br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
-            ELSE
-              br2_emi = br2_emi + drydepflx_hbr(i,j)
-              brcl_emi = brcl_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j) - drydepflx_hbr(i,j))
-            END IF
+          ! ELSEIF (xice(i,j) .GT. 0.9 .AND. seaice_age(i,j) >= 1.5) THEN
+          !   !TODO Over MY ice, 2 cases
+          !   !   1 - if HOBr+BrONO2 deposition <= HBr deposition, it gets converted to
+          !   !   Br2
+          !   !   2 - if HOBr+BrONO2 deposition > HBr deposition, an amount of [HBr]
+          !   !   gets converted to Br2 and the excess part gets converted to BrCl
+          !   !   (or 50% Br2 if there is no chlorine in the mechanism)
+          ! ! This is disabled for now, as there is no strong evidence that MYI
+          ! and FYI act differently (Kenjiro Toyota, personal communication)
+          !   IF ((drydepflx_hobr(i,j) + drydepflx_brno3(i,j)) .LE. drydepflx_hbr(i,j)) THEN
+          !     br2_emi = br2_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j))
+          !   ELSE
+          !     br2_emi = br2_emi + drydepflx_hbr(i,j)
+          !     brcl_emi = brcl_emi + (drydepflx_hobr(i,j) + drydepflx_brno3(i,j) - drydepflx_hbr(i,j))
+          !   END IF
 
           END IF
 
