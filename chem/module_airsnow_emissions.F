@@ -30,12 +30,17 @@
 ! Remarks:
 ! For now, this is only coupled to the SAPRC99_MOSAIC_8BIN_VBS2_AQ_HALOGENS_KPP
 ! gas-phase/aerosol mechanism
-! At the very least, this module assumes that MOSAIC is used with the standard 8 size bins
+! At the very least, this module assumes that MOSAIC is used with the standard 8
+! size bins.
+! In order to use this code with a different aerosol module,
+! mosaic_massfrac_nacl and depletion_factor need to be updated to correspond to
+! the aerosol sizes in the new module (+ all of the other instances using isize,
+! itype, or iphase)
 !
+!TODO define parameters as FORTRAN parameters, and separate them from other data
+! declaration
 !TODO add a check for lake ice
-!TODO Ideally, blowing snow should be in a separate module, and if it becomes
-! available it would be better to  use snow salinity data for the Arctic instead
-! of the Antarctic data used here
+!TODO Ideally, blowing snow should be in a separate module
 !TODO The blowing snow code can be updated with latest developments, from
 ! https://doi.org/10.5194/acp-19-8407-2019, 2019. 
 !
@@ -126,7 +131,7 @@ CONTAINS
   ! saltation layer (kg/kg), Snow mixing ratio at reference wind speed (kg/kg)
   REAL :: br_emi, nacl_emi, qsnow_subl, qsnow_subl_prime, qsnow_saltation, qsnow_0
   ! 10m-windspeed (m/s), critical 10m-windspeed (m/s), temperature-moisture
-  ! parameter from Dery and Yau 2001 (-1E-12 m2/s-1), ice saturation mixing
+  ! parameter from Dery and Yau 2001 (-1.0E-12 m2/s-1), ice saturation mixing
   ! ratio (kg/kg), conductivity term in the sublimation process (m s kg−1),
   ! diffusion term in the sublimation process (m s kg−1), saturation water vapor
   ! pressure wrt ice (Pa)
@@ -143,8 +148,11 @@ CONTAINS
   INTEGER :: itype, isize, iphase, l_num, l_na, l_cl
   ! Br/NaCl mass ratio in sea salt (kg/kg)
   REAL :: br_nacl_massratio = 0.00233
-  ! Average Antarctic snow salinity (psu) - from Massom et al. (2001)
-  REAL :: snow_salinity = 8.5
+  ! Average Antarctic snow salinity (psu)
+  ! ! Massom et al. (2001)
+  ! REAL :: snow_salinity = 8.5
+  ! Huang and Jaegle, 2017
+  REAL :: snow_salinity = 0.1
   ! Conversion factor (from kg/m2/day to kg/m2/s)
   REAL :: kconv_day_s = 1.1574E-5
   ! Adjustment factor for the emission flux, based on snow age (unitless),
@@ -176,8 +184,12 @@ CONTAINS
 
   !---- Data declaration
   ! Calculated based on Yang et al. (2018) for the MOSAIC size bins
-  mosaic_massfrac_nacl = (/ 0.2189E-09, 0.6873E-08, 0.2122E-06, 0.6306E-05, &
-                            0.1742E-03, 0.4182E-02, 0.7729E-01, 0.9183E+00 /)
+  ! ! Based on snow salinity from Massom et al. (2001)
+  ! mosaic_massfrac_nacl = (/ 0.2189E-09, 0.6873E-08, 0.2122E-06, 0.6306E-05, &
+  !                           0.1742E-03, 0.4182E-02, 0.7729E-01, 0.9183E+00 /)
+  ! Based on snow salinity and N=5 aerosol fractioning, Huang and Jaegle (2017)
+  mosaic_massfrac_nacl = (/ 0.1532E-04, 0.3808E-03, 0.7398E-02, 0.8854E-01, &
+                            0.4288E+00, 0.4375E+00, 0.3741E-01, 0.3155E-04 /)
   depletion_factor = (/ -3.8200, -3.8200, -3.6856, -2.2739, &
                          0.0965, 0.3379, 0.2332, 0.1393  /)
   do_snow_emissions = .true.
@@ -322,7 +334,7 @@ CONTAINS
 
             ! Sea salt emission flux (kg/m2/s), from Yang et al., (2008), using
             ! the mean Antarctic snow salinity from Massom et al. (2001)
-            ! scaled by the ice fraction
+            ! scaled by the ice fraction.
             nacl_emi = qsnow_subl * snow_salinity / 1000. * xice(i, j)
             IF (nacl_emi < 0.) THEN
             !  write(msg,*) 'module_airsnow_emissions: nacl_emi < 0., nacl_emi=',nacl_emi,' at i,j=',i,j
@@ -367,7 +379,7 @@ CONTAINS
         IF (l_num >= param_first_scalar) THEN
           ! Calculate the change in aerosol number concentrations due to
           ! the sea salt emissions (#/m2/s). dcen_sect is in cm in MOSAIC
-          aer_num_change = nacl_emi / rho_nacl * 6.0/pi * 1.0/(dcen_sect(isize,itype)*1E-2)**3.0
+          aer_num_change = nacl_emi / rho_nacl * 6.0/pi * 1.0/(dcen_sect(isize,itype)*1.0E-2)**3.0
           ! #/m2/s -> #/kg
           chem(i,kts,j,l_num) = chem(i,kts,j,l_num) + aer_num_change * conv3
         END IF
