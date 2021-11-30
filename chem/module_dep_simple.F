@@ -3257,7 +3257,7 @@ is_cbm4_kpp : &
          dvj(p_hbr) = 0.111
          ! BrONO2, assuming same Henry's law constants as HBr, following Toyota
          ! et al.  (2011, doi:10.5194/acp-11-3949-2011)
-         hstar(p_hbr) = 24.3
+         hstar(p_brono2) = 24.3
          dhr(p_brono2) = 370.
          f0(p_brono2) = 1.
          dvj(p_brono2) = 0.084
