@@ -90,9 +90,9 @@
     INTEGER,  PARAMETER :: i_hcl = 3
     INTEGER,  PARAMETER :: i_hbr = 4
     INTEGER,  PARAMETER :: i_n2o5 = 5
-    INTEGER,  PARAMETER :: i_hocl = 5
-    INTEGER,  PARAMETER :: i_clono2 = 5
-    INTEGER,  PARAMETER :: i_oh = 5
+    INTEGER,  PARAMETER :: i_hocl = 6
+    INTEGER,  PARAMETER :: i_clono2 = 7
+    INTEGER,  PARAMETER :: i_oh = 8
     ! CHARACTER*6, DIMENSION(nspecies) :: specnames
     REAL(r8), DIMENSION(nspecies) :: gamma_factors
     REAL(r8), DIMENSION(nspecies) :: molar_weights
