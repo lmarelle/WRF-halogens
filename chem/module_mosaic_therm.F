@@ -147,7 +147,12 @@
 
           ! LMarelle - calculate pH
           do isize = 1,nbin_a
-            aerosol_ph  = MIN(14.0D0, MAX(0.0D0, -log10(mc(jc_h,isize)) ))
+            if(mc(jc_h,isize) .gt. 0.0) then
+              aerosol_ph  = MIN(14.0D0, MAX(0.0D0, -log10(mc(jc_h,isize)) ))
+            else
+              ! Set to invalid value
+              aerosol_ph = -999.999
+            endif
             if (isize == 1) then
               aer_ph_01_k(k) = aerosol_ph
             elseif (isize == 2) then
